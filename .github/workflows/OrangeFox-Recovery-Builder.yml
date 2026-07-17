@@ -112,7 +112,7 @@ jobs:
       id: fox_branch
       with:
         cond: ${{ github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' }}
-        if_true: git clone https://github.com/SGCMarkus/android_device_motorola_sm7325-common -b lineage-20 device/motorola/sm7325-common && mkdir -p vendor/motorola/sm7325-common && touch vendor/motorola/sm7325-common/sm7325-common-vendor.mk && mkdir -p vendor/motorola/berlin && touch vendor/motorola/berlin/berlin-vendor.mk && lunch lineage_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
+        if_true: git clone https://github.com/SGCMarkus/android_device_motorola_sm7325-common -b lineage-20 device/motorola/sm7325-common && sed -i '/full_base_telephony.mk/s/^/#/' device/motorola/berlin/lineage_berlin.mk && sed -i '/common_full_phone.mk/s/^/#/' device/motorola/berlin/lineage_berlin.mk && lunch lineage_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
         if_false: lunch omni_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka ${{ github.event.inputs.BUILD_TARGET }}image
       
     - name: Building OrangeFox
