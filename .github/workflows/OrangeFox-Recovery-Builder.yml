@@ -112,7 +112,8 @@ jobs:
       id: fox_branch
       with:
         cond: ${{ github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' }}
-        if_true: git clone https://github.com/SGCMarkus/android_device_motorola_sm7325-common -b lineage-20 device/motorola/sm7325-common && echo -e "PRODUCT_NAME := lineage_berlin\nPRODUCT_DEVICE := berlin\nPRODUCT_BRAND := motorola\nPRODUCT_MODEL := motorola edge 20" > device/motorola/berlin/lineage_berlin.mk && lunch lineage_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
+        
+        if_true: git clone https://github.com/SGCMarkus/android_device_motorola_sm7325-common -b lineage-20 device/motorola/sm7325-common && echo -e "PRODUCT_NAME := lineage_berlin\nPRODUCT_DEVICE := berlin\nPRODUCT_BRAND := motorola\nPRODUCT_MODEL := motorola edge 20\nPRODUCT_MANUFACTURER := motorola\nALLOW_MISSING_DEPENDENCIES := true" > device/motorola/berlin/lineage_berlin.mk && find device/motorola -name "*.mk" -type f -exec sed -i '/include.*vendor/s/^/#/' {} + && find device/motorola -name "*.mk" -type f -exec sed -i '/include.*sepolicy/s/^/#/' {} + && find device/motorola -name "*.mk" -type f -exec sed -i '/include.*hardware/s/^/#/' {} + && lunch lineage_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
         if_false: lunch omni_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka ${{ github.event.inputs.BUILD_TARGET }}image
       
     - name: Building OrangeFox
