@@ -124,7 +124,9 @@ jobs:
           echo 'PRODUCT_MODEL := motorola edge 20' >> device/motorola/berlin/lineage_berlin.mk
           echo 'ALLOW_MISSING_DEPENDENCIES := true' >> device/motorola/berlin/lineage_berlin.mk
           
+          # ОЦІ РЯДКИ ОНОВЛЕНО (додано видалення з BoardConfigCommon.mk)
           sed -i '/BoardConfigVendor.mk/d' device/motorola/berlin/BoardConfig.mk
+          sed -i '/BoardConfigVendor.mk/d' device/motorola/sm7325-common/BoardConfigCommon.mk
           sed -i '/sepolicy/s/^/#/' device/motorola/sm7325-common/BoardConfigCommon.mk
           sed -i '/vendor\/qcom/s/^/#/' device/motorola/sm7325-common/BoardConfigCommon.mk
           
