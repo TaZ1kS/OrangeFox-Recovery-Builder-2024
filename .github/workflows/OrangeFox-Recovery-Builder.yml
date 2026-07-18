@@ -107,15 +107,46 @@ jobs:
         cd ${{ github.event.inputs.DEVICE_PATH }}
         echo "COMMIT_ID=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-    - name: Check Manifest Branch
-      uses: haya14busa/action-cond@v1
-      id: fox_branch
-      with:
-        cond: ${{ github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' }}
+    - name: Building OrangeFox
+      run: |
+        cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
         
-        if_true: git clone https://github.com/SGCMarkus/android_device_motorola_sm7325-common -b lineage-20 device/motorola/sm7325-common && echo -e "PRODUCT_NAME := lineage_berlin\nPRODUCT_DEVICE := berlin\nPRODUCT_BRAND := motorola\nPRODUCT_MODEL := motorola edge 20\nPRODUCT_MANUFACTURER := motorola\nALLOW_MISSING_DEPENDENCIES := true" > device/motorola/berlin/lineage_berlin.mk && find device/motorola -name "*.mk" -type f -exec sed -i '/include.*vendor/s/^/#/' {} + && find device/motorola -name "*.mk" -type f -exec sed -i '/include.*sepolicy/s/^/#/' {} + && find device/motorola -name "*.mk" -type f -exec sed -i '/include.*hardware/s/^/#/' {} + && lunch lineage_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
-        if_false: lunch omni_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka ${{ github.event.inputs.BUILD_TARGET }}image
-      
+        if [ "${{ github.event.inputs.MANIFEST_BRANCH }}" = "11.0" ] || [ "${{ github.event.inputs.MANIFEST_BRANCH }}" = "12.1" ]; then
+          echo "==== Запуск кастрації дерева пристрою Motorola ===="
+          
+          git clone https://github.com/SGCMarkus/android_device_motorola_sm7325-common -b lineage-20 device/motorola/sm7325-common
+          
+          echo '$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)' > device/motorola/berlin/lineage_berlin.mk
+          echo 'PRODUCT_NAME := lineage_berlin' >> device/motorola/berlin/lineage_berlin.mk
+          echo 'PRODUCT_DEVICE := berlin' >> device/motorola/berlin/lineage_berlin.mk
+          echo 'PRODUCT_MANUFACTURER := motorola' >> device/motorola/berlin/lineage_berlin.mk
+          echo 'PRODUCT_BRAND := motorola' >> device/motorola/berlin/lineage_berlin.mk
+          echo 'PRODUCT_MODEL := motorola edge 20' >> device/motorola/berlin/lineage_berlin.mk
+          echo 'ALLOW_MISSING_DEPENDENCIES := true' >> device/motorola/berlin/lineage_berlin.mk
+          
+          sed -i '/BoardConfigVendor.mk/d' device/motorola/berlin/BoardConfig.mk
+          sed -i '/sepolicy/s/^/#/' device/motorola/sm7325-common/BoardConfigCommon.mk
+          sed -i '/vendor\/qcom/s/^/#/' device/motorola/sm7325-common/BoardConfigCommon.mk
+          
+          set +e
+          source build/envsetup.sh
+          export ALLOW_MISSING_DEPENDENCIES=true
+          set -e
+          lunch lineage_${{ github.event.inputs.DEVICE_NAME }}-eng
+          make clean
+          mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
+          
+        else
+          echo "==== Запуск стандартної збірки Omni ===="
+          set +e
+          source build/envsetup.sh
+          export ALLOW_MISSING_DEPENDENCIES=true
+          set -e
+          lunch omni_${{ github.event.inputs.DEVICE_NAME }}-eng
+          make clean
+          mka ${{ github.event.inputs.BUILD_TARGET }}image
+        fi
+        
     - name: Building OrangeFox
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
