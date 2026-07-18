@@ -128,11 +128,16 @@ jobs:
           echo 'PRODUCT_MODEL := motorola edge 20' >> device/motorola/berlin/lineage_berlin.mk
           echo 'ALLOW_MISSING_DEPENDENCIES := true' >> device/motorola/berlin/lineage_berlin.mk
           
-          # ОЦІ РЯДКИ ОНОВЛЕНО (додано видалення з BoardConfigCommon.mk)
           sed -i '/BoardConfigVendor.mk/d' device/motorola/berlin/BoardConfig.mk
           sed -i '/BoardConfigVendor.mk/d' device/motorola/sm7325-common/BoardConfigCommon.mk
           sed -i '/sepolicy/s/^/#/' device/motorola/sm7325-common/BoardConfigCommon.mk
           sed -i '/vendor\/qcom/s/^/#/' device/motorola/sm7325-common/BoardConfigCommon.mk
+          
+          # ОЦІ РЯДКИ ВИПРАВЛЯЮТЬ ПОМИЛКУ ЕКРАНА ТА ОШИБКУ TW_THEME
+          echo 'TW_THEME := portrait_hdpi' >> device/motorola/berlin/BoardConfig.mk
+          echo 'TARGET_SCREEN_WIDTH := 1080' >> device/motorola/berlin/BoardConfig.mk
+          echo 'TARGET_SCREEN_HEIGHT := 2400' >> device/motorola/berlin/BoardConfig.mk
+          echo 'OF_SCREEN_H := 2400' >> device/motorola/berlin/BoardConfig.mk
           
           set +e
           source build/envsetup.sh
