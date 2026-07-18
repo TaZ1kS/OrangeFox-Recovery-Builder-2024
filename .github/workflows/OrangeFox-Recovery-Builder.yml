@@ -109,7 +109,9 @@ jobs:
 
     - name: Setup SSH Debug Session (tmate)
       uses: mxschmitt/action-tmate@v3
-      if: always() # Це щоб сесія запускалася в будь-якому випадку
+      if: always()
+      with:
+        limit-access-to-actor: false # Дозволить підключитися через Web-shell без анальних перевірок ключів
 
     - name: Building OrangeFox
       run: |
