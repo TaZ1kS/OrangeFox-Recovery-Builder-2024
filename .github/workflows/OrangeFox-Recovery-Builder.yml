@@ -107,6 +107,10 @@ jobs:
         cd ${{ github.event.inputs.DEVICE_PATH }}
         echo "COMMIT_ID=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
+    - name: Setup SSH Debug Session (tmate)
+      uses: mxschmitt/action-tmate@v3
+      if: always() # Це щоб сесія запускалася в будь-якому випадку
+
     - name: Building OrangeFox
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
